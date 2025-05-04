@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }}</title>
+    <link rel="stylesheet" href="/static/fifo.css">
+    <link rel="icon" href="/static/GHGZ2_xXsAA3SFR.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .home-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        input[type="number"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: white;
+            width: 100px;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #00dbde;
+        }
+        button[type="submit"] {
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            border: none;
+            border-radius: 10px;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem 0;
+        }
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.4);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        th {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        .results {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .results p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 2rem auto;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <form action="{{ url_for('home') }}">
+                <button type="submit" class="home-btn">← Back to Home</button>
+            </form>
+        </div>
+        <h1>{{ name }}</h1>
+        
+        <div class="form-container">
+            <form method="post">
+                <div class="input-group">
+                    <label>Total Number of Processes:</label>
+                    <input name="n" type="number" value="{{ n }}" min="0">
+                </div>
+                
+                {% if name == 'ROUND ROBIN' %}
+                <div class="input-group">
+                    <label>Time Quantum:</label>
+                    <input type="number" min="1" name="tq" value="{{time_quantum}}">
+                </div>
+                {% endif %}
+                
+                <button type="submit">SUBMIT</button>
+                
+                {% if n %}
+                    {% for i in range(n) %}
+                        <div class="input-group">
+                            <label>P{{ i+1 }} Arrival Time:</label>
+                            <input type="number" min="0" name="at{{ i }}">
+                            <label>P{{ i+1 }} Burst Time:</label>
+                            <input type="number" min="1" name="bt{{ i }}">
+                            {% if name == 'PRIORITY' %}
+                            <label>P{{i+1}} Priority:</label>
+                            <input type="number" min="0" name="priority{{i}}">
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" id="start" name="start">CALCULATE</button>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if table %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Process Number</th>
+                        <th>Burst Time</th>
+                        <th>Arrival Time</th>
+                        {% if name == 'PRIORITY' %}
+                        <th>Priority</th>
+                        {% endif %}
+                        <th>Waiting Time</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(n) %}
+                        <tr>
+                            <td>{{ i+1 }}</td>
+                            <td>{{ bt[i] }}</td>
+                            <td>{{ at[i] }}</td>
+                            {% if name == 'PRIORITY' %}
+                            <td>{{ prio[i] }}</td>
+                            {% endif %}
+                            <td>{{ wt[i] }}</td>
+                            <td>{{ tat[i] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="results">
+                <p>Average Waiting Time: {{ AvgWT }}</p>
+                <p>Average Turnaround Time: {{ AVGTaT }}</p>
+            </div>
+        {% endif %}
+
+        {% if graph %}
+            <img src="data:image/png;base64,{{ graph }}" alt="Scheduling Graph">
+        {% endif %}
+    </div>
+</body>
+</html>
