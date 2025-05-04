@@ -1,66 +1,84 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+import sys
+import traceback
 
-from graph import graph , graphRound
+from graph import graph, graphRound
 
 app = Flask(__name__)
+
+# Error handler
+@app.errorhandler(Exception)
+def handle_error(error):
+    print(f"Error occurred: {str(error)}", file=sys.stderr)
+    print(traceback.format_exc(), file=sys.stderr)
+    return jsonify({"error": str(error)}), 500
 
 # Vercel requires this handler
 @app.route("/api/<path:path>", methods=['GET', 'POST'])
 def api_handler(path):
-    return app.handle_request(request)
+    try:
+        return app.handle_request(request)
+    except Exception as e:
+        return handle_error(e)
 
 @app.route("/", methods=['POST', 'GET'])
 def home():
-    return render_template("index.html")
+    try:
+        return render_template("index.html")
+    except Exception as e:
+        return handle_error(e)
 
 @app.route("/fifo", methods=['POST', 'GET'])
 def fifo():
-    if request.method == 'GET':
-        n = 0
-    if request.method == 'POST':
-        n = int(request.form['n'])
-        if n != 0:
-            data = request.form
-            last_data = list(data.items())[-1]
-            if last_data[0] == 'start':
-                arrival_time = []
-                burst_time = []
-                CPU = 0
-                for i in range(n):
-                    arrival_time.append(int(request.form.get('at' + str(i))))
-                    burst_time.append(int(request.form.get('bt' + str(i))))
-                ATt = [0] * n
-                NoP = n  # number of Processes
-                waiting_time = [0] * n
-                turnaround_time = [0] * n
-                start_time = [0] * n
-                end_time = [0] * n
-
-                for i in range(n):
-                    ATt[i] = arrival_time[i]
-
-                while NoP > 0 :
+    try:
+        if request.method == 'GET':
+            n = 0
+        if request.method == 'POST':
+            n = int(request.form['n'])
+            if n != 0:
+                data = request.form
+                last_data = list(data.items())[-1]
+                if last_data[0] == 'start':
+                    arrival_time = []
+                    burst_time = []
+                    CPU = 0
                     for i in range(n):
-                        if ATt[i] <= CPU:
-                            waiting_time[i] = CPU - arrival_time[i]
-                            start_time[i] = CPU 
-                            CPU += burst_time[i]
-                            end_time[i] = CPU
-                            turnaround_time[i] = CPU - arrival_time[i]
-                            ATt[i] = float('inf')
-                            NoP -= 1
-                            break
-                    else:
-                        CPU += 1
-                
-                graph_base64 = graph('FIFO GRAPH',start_time,end_time,n)
-                    
-                return render_template("program.html", n=n, bt=burst_time, at=arrival_time, wt=waiting_time,
-                                       tat=turnaround_time, AvgWT=round((sum(waiting_time) / n), 2),
-                                       AVGTaT=round((sum(turnaround_time) / n), 2), table=True, name='FIFO',
-                                       graph=graph_base64)
+                        arrival_time.append(int(request.form.get('at' + str(i))))
+                        burst_time.append(int(request.form.get('bt' + str(i))))
+                    ATt = [0] * n
+                    NoP = n  # number of Processes
+                    waiting_time = [0] * n
+                    turnaround_time = [0] * n
+                    start_time = [0] * n
+                    end_time = [0] * n
 
-    return render_template("program.html", n=n, table=False, name='FIFO')
+                    for i in range(n):
+                        ATt[i] = arrival_time[i]
+
+                    while NoP > 0:
+                        for i in range(n):
+                            if ATt[i] <= CPU:
+                                waiting_time[i] = CPU - arrival_time[i]
+                                start_time[i] = CPU 
+                                CPU += burst_time[i]
+                                end_time[i] = CPU
+                                turnaround_time[i] = CPU - arrival_time[i]
+                                ATt[i] = float('inf')
+                                NoP -= 1
+                                break
+                        else:
+                            CPU += 1
+                    
+                    graph_base64 = graph('FIFO GRAPH', start_time, end_time, n)
+                        
+                    return render_template("program.html", n=n, bt=burst_time, at=arrival_time, wt=waiting_time,
+                                           tat=turnaround_time, AvgWT=round((sum(waiting_time) / n), 2),
+                                           AVGTaT=round((sum(turnaround_time) / n), 2), table=True, name='FIFO',
+                                           graph=graph_base64)
+
+        return render_template("program.html", n=n, table=False, name='FIFO')
+    except Exception as e:
+        return handle_error(e)
 
 @app.route("/sjf", methods=['POST', 'GET'])
 def sjf():

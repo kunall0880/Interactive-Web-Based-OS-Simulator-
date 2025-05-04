@@ -7,14 +7,6 @@
             "config": {
                 "runtime": "python3.9"
             }
-        },
-        {
-            "src": "templates/**",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "static/**",
-            "use": "@vercel/static"
         }
     ],
     "routes": [
@@ -26,5 +18,8 @@
             "src": "/(.*)",
             "dest": "app.py"
         }
-    ]
+    ],
+    "env": {
+        "PYTHONPATH": "."
+    }
 } 
