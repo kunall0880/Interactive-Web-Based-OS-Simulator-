@@ -4,81 +4,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CPU Scheduling Algorithms</title>
-    <link rel="stylesheet" href="/static/main.css">
+    <!-- Use a more reliable Tailwind CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="icon" href="/static/GHGZ2_xXsAA3SFR.jpeg">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 2rem;
-            color: #fff;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        .algorithm-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        .algorithm-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 1.5rem;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-        }
-        .algorithm-btn:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 10px #00dbde, 0 0 20px #00dbde, 0 0 30px #00dbde;
+    <script>
+        // Initialize Tailwind with a fallback
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '#1a202c',
+                            secondary: '#2d3748',
+                        }
+                    }
+                }
             }
-            to {
-                text-shadow: 0 0 20px #fc00ff, 0 0 30px #fc00ff, 0 0 40px #fc00ff;
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .algorithm-card {
+                @apply bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300;
+            }
+            .algorithm-title {
+                @apply text-2xl font-semibold text-gray-800;
+            }
+            .algorithm-desc {
+                @apply text-gray-600 mb-4;
+            }
+            .algorithm-btn {
+                @apply w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300;
+            }
+            .info-box {
+                @apply bg-blue-50 p-4 rounded-lg mb-4;
+            }
+            .info-title {
+                @apply font-semibold text-blue-800 mb-2;
+            }
+            .info-list {
+                @apply list-disc list-inside text-blue-700;
+            }
+            .algorithm-icon {
+                @apply w-16 h-16 mr-4 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>CPU Scheduling Algorithms</h1>
-        <div class="algorithm-grid">
-            <form action="{{ url_for('fifo') }}">
-                <button type="submit" class="algorithm-btn">FIFO</button>
-            </form>
-            <form action="{{ url_for('sjf') }}">
-                <button type="submit" class="algorithm-btn">SJF</button>
-            </form>
-            <form action="{{ url_for('priority') }}">
-                <button type="submit" class="algorithm-btn">PRIORITY</button>
-            </form>
-            <form action="{{ url_for('roundRobin') }}">
-                <button type="submit" class="algorithm-btn">ROUND ROBIN</button>
-            </form>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">CPU Scheduling Algorithms</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Explore and understand different CPU scheduling algorithms through interactive visualization and practical examples.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- FIFO Card -->
+            <div class="algorithm-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="algorithm-icon">
+                            <span class="text-2xl">FIFO</span>
+                        </div>
+                        <h2 class="algorithm-title">FIFO (First In First Out)</h2>
+                    </div>
+                    <p class="algorithm-desc">
+                        The simplest scheduling algorithm where processes are executed in the order they arrive. Like a queue at a ticket counter, the first process to arrive is the first to be executed.
+                    </p>
+                    <div class="info-box">
+                        <h3 class="info-title">Key Characteristics:</h3>
+                        <ul class="info-list">
+                            <li>Simple to implement</li>
+                            <li>No starvation</li>
+                            <li>Poor average waiting time</li>
+                            <li>Non-preemptive</li>
+                        </ul>
+                    </div>
+                    <form action="{{ url_for('fifo') }}" class="mt-4">
+                        <button type="submit" class="algorithm-btn">Explore FIFO</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SJF Card -->
+            <div class="algorithm-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="algorithm-icon">
+                            <span class="text-2xl">SJF</span>
+                        </div>
+                        <h2 class="algorithm-title">SJF (Shortest Job First)</h2>
+                    </div>
+                    <p class="algorithm-desc">
+                        Executes processes with the shortest burst time first. Like a smart queue where shorter tasks are prioritized, minimizing the average waiting time.
+                    </p>
+                    <div class="info-box">
+                        <h3 class="info-title">Key Characteristics:</h3>
+                        <ul class="info-list">
+                            <li>Minimizes average waiting time</li>
+                            <li>Optimal for batch systems</li>
+                            <li>Requires knowledge of process lengths</li>
+                            <li>Can cause starvation</li>
+                        </ul>
+                    </div>
+                    <form action="{{ url_for('sjf') }}" class="mt-4">
+                        <button type="submit" class="algorithm-btn">Explore SJF</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Priority Card -->
+            <div class="algorithm-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="algorithm-icon">
+                            <span class="text-2xl">PRI</span>
+                        </div>
+                        <h2 class="algorithm-title">Priority Scheduling</h2>
+                    </div>
+                    <p class="algorithm-desc">
+                        Processes are executed based on their priority levels. Like a hospital emergency room where critical patients are treated first, regardless of arrival time.
+                    </p>
+                    <div class="info-box">
+                        <h3 class="info-title">Key Characteristics:</h3>
+                        <ul class="info-list">
+                            <li>Processes with higher priority execute first</li>
+                            <li>Useful for real-time systems</li>
+                            <li>Can be preemptive or non-preemptive</li>
+                            <li>May cause starvation</li>
+                        </ul>
+                    </div>
+                    <form action="{{ url_for('priority') }}" class="mt-4">
+                        <button type="submit" class="algorithm-btn">Explore Priority</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Round Robin Card -->
+            <div class="algorithm-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="algorithm-icon">
+                            <span class="text-2xl">RR</span>
+                        </div>
+                        <h2 class="algorithm-title">Round Robin</h2>
+                    </div>
+                    <p class="algorithm-desc">
+                        Each process gets a fixed time quantum for execution. Like a time-sharing system where each process gets an equal slice of CPU time.
+                    </p>
+                    <div class="info-box">
+                        <h3 class="info-title">Key Characteristics:</h3>
+                        <ul class="info-list">
+                            <li>Fair allocation of CPU time</li>
+                            <li>Prevents starvation</li>
+                            <li>Good for time-sharing systems</li>
+                            <li>Performance depends on time quantum</li>
+                        </ul>
+                    </div>
+                    <form action="{{ url_for('roundRobin') }}" class="mt-4">
+                        <button type="submit" class="algorithm-btn">Explore Round Robin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-white rounded-xl shadow-md p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">About This Simulator</h2>
+            <p class="text-gray-600 mb-4">
+                This interactive simulator helps you understand CPU scheduling algorithms through visualization and practical examples. Each algorithm is explained with its key concepts, and you can experiment with different process configurations to see how they affect scheduling outcomes.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-2">Learning Objectives</h3>
+                    <ul class="list-disc list-inside text-blue-700">
+                        <li>Understand different scheduling algorithms</li>
+                        <li>Compare algorithm performance</li>
+                        <li>Analyze waiting and turnaround times</li>
+                        <li>Visualize process execution</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-800 mb-2">Features</h3>
+                    <ul class="list-disc list-inside text-green-700">
+                        <li>Interactive process input</li>
+                        <li>Real-time calculations</li>
+                        <li>Visual timeline representation</li>
+                        <li>Performance metrics</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </body>

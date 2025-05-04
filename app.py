@@ -4,6 +4,10 @@ from graph import graph , graphRound
 
 app = Flask(__name__)
 
+# Vercel requires this handler
+@app.route("/api/<path:path>", methods=['GET', 'POST'])
+def api_handler(path):
+    return app.handle_request(request)
 
 @app.route("/", methods=['POST', 'GET'])
 def home():
@@ -254,3 +258,6 @@ def roundRobin():
 
 if __name__ == "__main__":
     app.run(debug=True)
+else:
+    # This is required for Vercel
+    handler = app

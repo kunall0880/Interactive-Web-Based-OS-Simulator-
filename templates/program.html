@@ -3,209 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ name }}</title>
-    <link rel="stylesheet" href="/static/fifo.css">
+    <title>{{ name }} - CPU Scheduling Simulator</title>
+    <!-- Use a more reliable Tailwind CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="icon" href="/static/GHGZ2_xXsAA3SFR.jpeg">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 2rem;
-            color: #fff;
+    <script>
+        // Initialize Tailwind with a fallback
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '#1a202c',
+                            secondary: '#2d3748',
+                        }
+                    }
+                }
+            }
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .home-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 0.8rem 1.5rem;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .home-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin: 1rem 0;
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .form-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        .input-group {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            align-items: center;
-        }
-        input[type="number"] {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 0.5rem;
-            color: white;
-            width: 100px;
-        }
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #00dbde;
-        }
-        button[type="submit"] {
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
-            border: none;
-            border-radius: 10px;
-            padding: 0.8rem 1.5rem;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 1rem 0;
-        }
-        button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.4);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        th {
-            background: rgba(255, 255, 255, 0.2);
-            font-weight: 600;
-        }
-        .results {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-            text-align: center;
-        }
-        .results p {
-            font-size: 1.2rem;
-            margin: 0.5rem 0;
-        }
-        img {
-            max-width: 100%;
-            border-radius: 10px;
-            margin: 2rem auto;
-            display: block;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .card {
+                @apply bg-white rounded-xl shadow-md p-6 mb-8;
+            }
+            .btn {
+                @apply py-2 px-4 rounded-lg transition-colors duration-300;
+            }
+            .btn-primary {
+                @apply bg-blue-600 text-white hover:bg-blue-700;
+            }
+            .btn-secondary {
+                @apply bg-gray-800 text-white hover:bg-gray-900;
+            }
+            .input-group {
+                @apply bg-gray-50 p-4 rounded-lg;
+            }
+            .input-label {
+                @apply block text-gray-700 font-medium mb-2;
+            }
+            .input-field {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+            }
+            .info-box {
+                @apply bg-blue-50 p-4 rounded-lg mb-4;
+            }
+            .info-title {
+                @apply font-semibold text-blue-800 mb-2;
+            }
+            .info-list {
+                @apply list-disc list-inside text-blue-700;
+            }
+            .algorithm-icon {
+                @apply w-24 h-24 mr-4 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <form action="{{ url_for('home') }}">
-                <button type="submit" class="home-btn">← Back to Home</button>
-            </form>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="card">
+            <div class="flex justify-between items-center">
+                <form action="{{ url_for('home') }}">
+                    <button type="submit" class="btn btn-secondary">
+                        ← Back to Home
+                    </button>
+                </form>
+            </div>
         </div>
-        <h1>{{ name }}</h1>
-        
-        <div class="form-container">
-            <form method="post">
-                <div class="input-group">
-                    <label>Total Number of Processes:</label>
-                    <input name="n" type="number" value="{{ n }}" min="0">
+
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">{{ name }} Algorithm</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+                <div class="card">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">About {{ name }}</h2>
+                    <div class="flex items-start mb-6">
+                        <div class="algorithm-icon">
+                            <span class="text-3xl">{{ name }}</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 mb-4">
+                                {% if name == 'FIFO' %}
+                                    First In First Out (FIFO) is the simplest scheduling algorithm where processes are executed in the order they arrive. It's like a queue at a ticket counter - the first person to arrive is the first to be served. While simple to implement, it may not always provide the best performance in terms of average waiting time.
+                                {% elif name == 'SJF' %}
+                                    Shortest Job First (SJF) executes processes with the shortest burst time first. This algorithm minimizes the average waiting time but requires knowledge of process lengths. It's like a smart queue where shorter tasks are prioritized to reduce overall waiting time.
+                                {% elif name == 'PRIORITY' %}
+                                    Priority Scheduling executes processes based on their priority levels. Higher priority processes are executed first, similar to how emergency cases are handled in a hospital. This is particularly useful for real-time systems where certain tasks must be completed urgently.
+                                {% else %}
+                                    Round Robin gives each process a fixed time quantum for execution. It's like a time-sharing system where each process gets an equal slice of CPU time. This prevents starvation and ensures fair allocation of CPU time among all processes.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="info-box">
+                            <h3 class="info-title">Advantages</h3>
+                            <ul class="info-list">
+                                {% if name == 'FIFO' %}
+                                    <li>Simple to implement</li>
+                                    <li>No starvation</li>
+                                    <li>Fair in terms of waiting time</li>
+                                    <li>Easy to understand</li>
+                                {% elif name == 'SJF' %}
+                                    <li>Minimizes average waiting time</li>
+                                    <li>Optimal for batch systems</li>
+                                    <li>Efficient for short processes</li>
+                                    <li>Good for minimizing response time</li>
+                                {% elif name == 'PRIORITY' %}
+                                    <li>Good for real-time systems</li>
+                                    <li>Flexible priority assignment</li>
+                                    <li>Can handle urgent processes</li>
+                                    <li>Useful for critical tasks</li>
+                                {% else %}
+                                    <li>Fair allocation of CPU time</li>
+                                    <li>Prevents starvation</li>
+                                    <li>Good for time-sharing systems</li>
+                                    <li>Responsive to all processes</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-red-800 mb-2">Disadvantages</h3>
+                            <ul class="list-disc list-inside text-red-700">
+                                {% if name == 'FIFO' %}
+                                    <li>Poor average waiting time</li>
+                                    <li>Not suitable for time-sharing</li>
+                                    <li>Non-preemptive</li>
+                                    <li>Long processes can block others</li>
+                                {% elif name == 'SJF' %}
+                                    <li>Requires knowledge of process lengths</li>
+                                    <li>Can cause starvation</li>
+                                    <li>Not suitable for interactive systems</li>
+                                    <li>Difficult to implement</li>
+                                {% elif name == 'PRIORITY' %}
+                                    <li>May cause starvation</li>
+                                    <li>Priority inversion problem</li>
+                                    <li>Complex priority assignment</li>
+                                    <li>Not always fair</li>
+                                {% else %}
+                                    <li>Performance depends on time quantum</li>
+                                    <li>Context switching overhead</li>
+                                    <li>Not optimal for all scenarios</li>
+                                    <li>Can be inefficient for long processes</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                
-                {% if name == 'ROUND ROBIN' %}
-                <div class="input-group">
-                    <label>Time Quantum:</label>
-                    <input type="number" min="1" name="tq" value="{{time_quantum}}">
-                </div>
-                {% endif %}
-                
-                <button type="submit">SUBMIT</button>
-                
-                {% if n %}
-                    {% for i in range(n) %}
-                        <div class="input-group">
-                            <label>P{{ i+1 }} Arrival Time:</label>
-                            <input type="number" min="0" name="at{{ i }}">
-                            <label>P{{ i+1 }} Burst Time:</label>
-                            <input type="number" min="1" name="bt{{ i }}">
-                            {% if name == 'PRIORITY' %}
-                            <label>P{{i+1}} Priority:</label>
-                            <input type="number" min="0" name="priority{{i}}">
+
+                <div class="card">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Process Configuration</h2>
+                    <form method="post" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="input-group">
+                                <label class="input-label">Total Number of Processes</label>
+                                <input name="n" type="number" value="{{ n }}" min="0" class="input-field">
+                            </div>
+                            
+                            {% if name == 'ROUND ROBIN' %}
+                            <div class="input-group">
+                                <label class="input-label">Time Quantum</label>
+                                <input type="number" min="1" name="tq" value="{{time_quantum}}" class="input-field">
+                            </div>
                             {% endif %}
                         </div>
-                    {% endfor %}
-                    <button type="submit" id="start" name="start">CALCULATE</button>
-                {% endif %}
-            </form>
-        </div>
 
-        {% if table %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Process Number</th>
-                        <th>Burst Time</th>
-                        <th>Arrival Time</th>
-                        {% if name == 'PRIORITY' %}
-                        <th>Priority</th>
+                        <button type="submit" class="btn btn-primary w-full">
+                            Continue
+                        </button>
+                        
+                        {% if n %}
+                            {% for i in range(n) %}
+                                <div class="input-group">
+                                    <h3 class="text-lg font-medium text-gray-800 mb-4">Process P{{ i+1 }}</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="input-label">Arrival Time</label>
+                                            <input type="number" min="0" name="at{{ i }}" class="input-field">
+                                        </div>
+                                        <div>
+                                            <label class="input-label">Burst Time</label>
+                                            <input type="number" min="1" name="bt{{ i }}" class="input-field">
+                                        </div>
+                                        {% if name == 'PRIORITY' %}
+                                        <div>
+                                            <label class="input-label">Priority</label>
+                                            <input type="number" min="0" name="priority{{i}}" class="input-field">
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <button type="submit" id="start" name="start" class="btn btn-primary w-full">
+                                Calculate Schedule
+                            </button>
                         {% endif %}
-                        <th>Waiting Time</th>
-                        <th>Turnaround Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in range(n) %}
-                        <tr>
-                            <td>{{ i+1 }}</td>
-                            <td>{{ bt[i] }}</td>
-                            <td>{{ at[i] }}</td>
-                            {% if name == 'PRIORITY' %}
-                            <td>{{ prio[i] }}</td>
-                            {% endif %}
-                            <td>{{ wt[i] }}</td>
-                            <td>{{ tat[i] }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            
-            <div class="results">
-                <p>Average Waiting Time: {{ AvgWT }}</p>
-                <p>Average Turnaround Time: {{ AVGTaT }}</p>
-            </div>
-        {% endif %}
+                    </form>
+                </div>
 
-        {% if graph %}
-            <img src="data:image/png;base64,{{ graph }}" alt="Scheduling Graph">
-        {% endif %}
+                {% if table %}
+                    <div class="card overflow-x-auto">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Results</h2>
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Process Number</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Burst Time</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival Time</th>
+                                    {% if name == 'PRIORITY' %}
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                    {% endif %}
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waiting Time</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turnaround Time</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for i in range(n) %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">P{{ i+1 }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ bt[i] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ at[i] }}</td>
+                                        {% if name == 'PRIORITY' %}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ prio[i] }}</td>
+                                        {% endif %}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ wt[i] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tat[i] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-lg font-medium text-blue-800">Average Waiting Time: {{ AvgWT }}</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <p class="text-lg font-medium text-green-800">Average Turnaround Time: {{ AVGTaT }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if graph %}
+                    <div class="card">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Scheduling Timeline</h2>
+                        <img src="data:image/png;base64,{{ graph }}" alt="Scheduling Graph" class="w-full rounded-lg">
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <div class="card">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Algorithm Details</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-medium text-gray-700">Type</h3>
+                            <p class="text-gray-600">
+                                {% if name == 'FIFO' %}
+                                    Non-preemptive
+                                {% elif name == 'SJF' %}
+                                    Can be preemptive or non-preemptive
+                                {% elif name == 'PRIORITY' %}
+                                    Can be preemptive or non-preemptive
+                                {% else %}
+                                    Preemptive
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700">Best Used For</h3>
+                            <p class="text-gray-600">
+                                {% if name == 'FIFO' %}
+                                    Batch processing systems
+                                {% elif name == 'SJF' %}
+                                    Systems with known process lengths
+                                {% elif name == 'PRIORITY' %}
+                                    Real-time and critical systems
+                                {% else %}
+                                    Time-sharing systems
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700">Complexity</h3>
+                            <p class="text-gray-600">
+                                {% if name == 'FIFO' %}
+                                    O(n)
+                                {% elif name == 'SJF' %}
+                                    O(n log n)
+                                {% elif name == 'PRIORITY' %}
+                                    O(n log n)
+                                {% else %}
+                                    O(n)
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Tips for Analysis</h2>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Compare waiting times across different algorithms
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Analyze the impact of process arrival patterns
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Consider the effect of burst time variations
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Evaluate fairness and starvation prevention
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
