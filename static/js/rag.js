@@ -1,0 +1,246 @@
+// Initialize the network
+const container = document.getElementById('rag-graph');
+const data = {
+    nodes: new vis.DataSet(),
+    edges: new vis.DataSet()
+};
+const options = {
+    nodes: {
+        shape: 'dot',
+        size: 30,
+        font: {
+            size: 16
+        }
+    },
+    edges: {
+        arrows: 'to',
+        smooth: {
+            type: 'cubicBezier'
+        }
+    },
+    physics: {
+        stabilization: false,
+        barnesHut: {
+            gravitationalConstant: -80000,
+            springConstant: 0.001,
+            springLength: 200
+        }
+    }
+};
+const network = new vis.Network(container, data, options);
+
+// Function to add a process to the RAG
+async function addProcess() {
+    const processId = document.getElementById('process-id').value;
+    if (processId) {
+        try {
+            const response = await fetch('/rag/add_node', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: processId,
+                    type: 'process'
+                })
+            });
+            
+            if (response.ok) {
+                data.nodes.add({ 
+                    id: processId, 
+                    label: processId, 
+                    color: { background: 'white' },
+                    shape: 'dot'
+                });
+                document.getElementById('process-id').value = '';
+                
+                // Update process select dropdown
+                const processSelect = document.getElementById('process-select');
+                const option = document.createElement('option');
+                option.value = processId;
+                option.textContent = processId;
+                processSelect.appendChild(option);
+            }
+        } catch (error) {
+            console.error('Error adding process:', error);
+        }
+    }
+}
+
+// Function to add a resource to the RAG
+async function addResource() {
+    const resourceId = document.getElementById('resource-id').value;
+    if (resourceId) {
+        try {
+            const response = await fetch('/rag/add_node', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: resourceId,
+                    type: 'resource'
+                })
+            });
+            
+            if (response.ok) {
+                data.nodes.add({ 
+                    id: resourceId, 
+                    label: resourceId, 
+                    color: { background: 'white' },
+                    shape: 'diamond'
+                });
+                document.getElementById('resource-id').value = '';
+                
+                // Update resource select dropdown
+                const resourceSelect = document.getElementById('resource-select');
+                const option = document.createElement('option');
+                option.value = resourceId;
+                option.textContent = resourceId;
+                resourceSelect.appendChild(option);
+            }
+        } catch (error) {
+            console.error('Error adding resource:', error);
+        }
+    }
+}
+
+// Function to add a request edge
+async function addRequestEdge() {
+    const processId = document.getElementById('process-select').value;
+    const resourceId = document.getElementById('resource-select').value;
+    
+    if (processId && resourceId) {
+        try {
+            const response = await fetch('/rag/add_edge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: processId,
+                    to: resourceId,
+                    type: 'request'
+                })
+            });
+            
+            if (response.ok) {
+                data.edges.add({
+                    from: processId,
+                    to: resourceId,
+                    arrows: 'to',
+                    color: { color: 'blue' }
+                });
+            }
+        } catch (error) {
+            console.error('Error adding request edge:', error);
+        }
+    }
+}
+
+// Function to add an allocation edge
+async function addAllocationEdge() {
+    const resourceId = document.getElementById('resource-select').value;
+    const processId = document.getElementById('process-select').value;
+    
+    if (processId && resourceId) {
+        try {
+            const response = await fetch('/rag/add_edge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: resourceId,
+                    to: processId,
+                    type: 'allocation'
+                })
+            });
+            
+            if (response.ok) {
+                data.edges.add({
+                    from: resourceId,
+                    to: processId,
+                    arrows: 'to',
+                    color: { color: 'green' }
+                });
+            }
+        } catch (error) {
+            console.error('Error adding allocation edge:', error);
+        }
+    }
+}
+
+// Function to show popup
+function showPopup(title, message) {
+    const overlay = document.getElementById('popup-overlay');
+    const popupTitle = document.getElementById('popup-title');
+    const popupMessage = document.getElementById('popup-message');
+    const closeButton = document.getElementById('popup-close');
+
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    overlay.classList.remove('hidden');
+
+    closeButton.onclick = function() {
+        overlay.classList.add('hidden');
+    };
+
+    // Close popup when clicking outside
+    overlay.onclick = function(e) {
+        if (e.target === overlay) {
+            overlay.classList.add('hidden');
+        }
+    };
+}
+
+// Function to check for deadlocks
+async function checkDeadlock() {
+    try {
+        const nodes = data.nodes.get();
+        const edges = data.edges.get();
+        
+        const response = await fetch('/rag/check_deadlock', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nodes: nodes.map(node => node.id),
+                edges: edges.map(edge => ({
+                    from: edge.from,
+                    to: edge.to
+                }))
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.deadlock) {
+                // Highlight nodes involved in the deadlock
+                for (const nodeId of result.nodes) {
+                    data.nodes.update({ id: nodeId, color: { background: 'red' } });
+                }
+                document.getElementById('deadlock-result').innerText = 'Deadlock detected!';
+                showPopup('Deadlock Detected', `Deadlock detected among: ${result.nodes.join(', ')}`);
+            } else {
+                // Reset node colors
+                for (const node of nodes) {
+                    data.nodes.update({ id: node.id, color: { background: 'white' } });
+                }
+                document.getElementById('deadlock-result').innerText = 'No deadlock detected.';
+                showPopup('No Deadlock', 'No deadlock detected in the current graph.');
+            }
+        }
+    } catch (error) {
+        console.error('Error checking for deadlock:', error);
+        showPopup('Error', 'An error occurred while checking for deadlock.');
+    }
+}
+
+// Add event listeners
+document.getElementById('add-process').addEventListener('click', addProcess);
+document.getElementById('add-resource').addEventListener('click', addResource);
+document.getElementById('add-request').addEventListener('click', addRequestEdge);
+document.getElementById('add-allocation').addEventListener('click', addAllocationEdge);
+document.getElementById('check-deadlock').addEventListener('click', checkDeadlock); 

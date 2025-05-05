@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Allocation Graph (RAG) Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/static/GHGZ2_xXsAA3SFR.jpeg">
+    <style>
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        .header p {
+            font-size: 1.125rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-field {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #1e293b;
+            background: white;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .graph-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            height: 400px;
+            margin: 2rem 0;
+        }
+        .graph-container {
+            height: 100%;
+            background: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background: #f8fafc;
+            color: #1e293b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .back-btn svg {
+            width: 1rem;
+            height: 1rem;
+        }
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .info-text {
+            color: #64748b;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .list-disc {
+            color: #64748b;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        #deadlock-result {
+            font-size: 0.875rem;
+            color: #1e293b;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            background: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z" clip-rule="evenodd" />
+        </svg>
+        Home
+    </a>
+
+    <div class="main-container">
+        <div class="header">
+            <h1>Resource Allocation Graph Simulator</h1>
+            <p>Interactive visualization tool for understanding resource allocation and deadlock detection</p>
+        </div>
+
+        <div class="controls-section">
+            <div class="card">
+                <h2 class="section-title">About RAG</h2>
+                <p class="info-text">
+                    A <b>Resource Allocation Graph (RAG)</b> is a directed graph that models resource allocation in a system.
+                    Processes and resources are represented as nodes, with edges showing requests and allocations.
+                </p>
+                <div class="mt-4">
+                    <h3 class="font-semibold text-gray-700 mb-2">Key Concepts:</h3>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Processes and resources as nodes</li>
+                        <li>Request edge: process → resource</li>
+                        <li>Allocation edge: resource → process</li>
+                        <li>Deadlock = cycle in the graph</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">Add Nodes</h2>
+                <div class="input-group">
+                    <input type="text" id="process-id" class="input-field" placeholder="Process ID">
+                    <button id="add-process" class="btn btn-primary">Add Process</button>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="resource-id" class="input-field" placeholder="Resource ID">
+                    <button id="add-resource" class="btn btn-success">Add Resource</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="graph-section">
+            <div id="rag-graph" class="graph-container"></div>
+        </div>
+
+        <div class="controls-section">
+            <div class="card">
+                <h2 class="section-title">Create Edges</h2>
+                <div class="input-group">
+                    <select id="process-select" class="input-field">
+                        <option value="">Select Process</option>
+                    </select>
+                    <select id="resource-select" class="input-field">
+                        <option value="">Select Resource</option>
+                    </select>
+                </div>
+                <div class="flex gap-4 mt-4">
+                    <button id="add-request" class="btn btn-warning">Add Request</button>
+                    <button id="add-allocation" class="btn btn-success">Add Allocation</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">Deadlock Detection</h2>
+                <button id="check-deadlock" class="btn btn-danger">Check for Deadlock</button>
+                <div id="deadlock-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="{{ url_for('static', filename='js/rag.js') }}"></script>
+</body>
+</html> 
