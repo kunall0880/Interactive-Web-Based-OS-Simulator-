@@ -48,6 +48,9 @@
             .algorithm-icon {
                 @apply w-16 h-16 mr-4 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400;
             }
+            .rag-btn {
+                @apply inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:from-purple-700 hover:to-indigo-700 transform hover:-translate-y-1 transition-all duration-300;
+            }
         }
     </style>
 </head>
@@ -55,9 +58,17 @@
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <header class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-800 mb-4">CPU Scheduling Algorithms</h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
                 Explore and understand different CPU scheduling algorithms through interactive visualization and practical examples.
             </p>
+            <a href="/rag" class="rag-btn">
+                <span class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                    </svg>
+                    Resource Allocation Graph Simulator
+                </span>
+            </a>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">

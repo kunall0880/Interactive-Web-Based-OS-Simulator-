@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 import sys
 import traceback
+import networkx as nx
 
 from graph import graph, graphRound
 
 app = Flask(__name__)
+
+# Initialize a directed graph for RAG
+rag_graph = nx.DiGraph()
 
 # Error handler
 @app.errorhandler(Exception)
@@ -273,6 +277,75 @@ def roundRobin():
                                        table=True, name='ROUND ROBIN', graph=graph_base64)
     return render_template("program.html", time_quantum=time_quantum, n=n, table=False, name='ROUND ROBIN')
 
+@app.route('/rag')
+def rag():
+    return render_template('rag.html')
+
+@app.route('/rag/check_deadlock', methods=['POST'])
+def check_rag_deadlock():
+    try:
+        data = request.get_json()
+        nodes = data.get('nodes', [])
+        edges = data.get('edges', [])
+        
+        # Clear existing graph
+        rag_graph.clear()
+        
+        # Add nodes and edges
+        rag_graph.add_nodes_from(nodes)
+        rag_graph.add_edges_from([(edge['from'], edge['to']) for edge in edges])
+        
+        # Check for cycles (deadlocks)
+        try:
+            cycle = nx.find_cycle(rag_graph)
+            # Get all nodes involved in the cycle
+            deadlock_nodes = set()
+            for edge in cycle:
+                deadlock_nodes.add(edge[0])
+                deadlock_nodes.add(edge[1])
+            return jsonify({
+                'deadlock': True,
+                'nodes': list(deadlock_nodes)
+            })
+        except nx.NetworkXNoCycle:
+            return jsonify({
+                'deadlock': False,
+                'nodes': []
+            })
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/rag/add_node', methods=['POST'])
+def add_rag_node():
+    try:
+        data = request.get_json()
+        node_id = data.get('id')
+        node_type = data.get('type')  # 'process' or 'resource'
+        
+        if node_id:
+            rag_graph.add_node(node_id, type=node_type)
+            return jsonify({'success': True})
+        return jsonify({'error': 'Invalid node ID'}), 400
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/rag/add_edge', methods=['POST'])
+def add_rag_edge():
+    try:
+        data = request.get_json()
+        from_node = data.get('from')
+        to_node = data.get('to')
+        edge_type = data.get('type')  # 'request' or 'allocation'
+        
+        if from_node and to_node:
+            rag_graph.add_edge(from_node, to_node, type=edge_type)
+            return jsonify({'success': True})
+        return jsonify({'error': 'Invalid edge data'}), 400
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
