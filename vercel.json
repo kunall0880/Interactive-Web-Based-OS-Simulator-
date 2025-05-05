@@ -3,7 +3,10 @@
     "builds": [
         {
             "src": "app.py",
-            "use": "@vercel/python"
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.11"
+            }
         }
     ],
     "routes": [
@@ -13,6 +16,13 @@
         }
     ],
     "env": {
-        "FLASK_ENV": "production"
+        "FLASK_ENV": "production",
+        "PYTHONPATH": "."
+    },
+    "functions": {
+        "app.py": {
+            "memory": 1024,
+            "maxDuration": 10
+        }
     }
 } 
