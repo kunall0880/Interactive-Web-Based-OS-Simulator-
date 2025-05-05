@@ -15,17 +15,25 @@ rag_graph = nx.DiGraph()
 def handle_error(error):
     print(f"Error occurred: {str(error)}", file=sys.stderr)
     print(traceback.format_exc(), file=sys.stderr)
-    return jsonify({"error": str(error)}), 500
+    
+    # Check if the request expects JSON
+    if request.is_json or request.path.startswith('/api/'):
+        return jsonify({"error": str(error)}), 500
+    else:
+        return render_template("error.html", error=str(error)), 500
 
 # Vercel requires this handler
-@app.route("/api/<path:path>", methods=['GET', 'POST'])
+@app.route("/api/<path:path>", methods=['GET', 'POST', 'PUT', 'DELETE'])
 def api_handler(path):
     try:
-        return app.handle_request(request)
+        # Handle API requests here
+        if request.method == 'GET':
+            return jsonify({"message": "API endpoint working"})
+        return jsonify({"error": "Method not supported"}), 405
     except Exception as e:
         return handle_error(e)
 
-@app.route("/", methods=['POST', 'GET'])
+@app.route("/", methods=['GET'])
 def home():
     try:
         return render_template("index.html")
