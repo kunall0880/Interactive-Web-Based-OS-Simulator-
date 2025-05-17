@@ -104,14 +104,14 @@ graph TD
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/Interactive-Web-Based-OS-Simulator.git
+git clone https://github.com/kunall0880/Interactive-Web-Based-OS-Simulator.git
 cd Interactive-Web-Based-OS-Simulator
 ```
 
 2. Create a virtual environment:
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate 
 ```
 
 3. Install dependencies:
