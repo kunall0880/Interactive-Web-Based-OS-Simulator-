@@ -1,49 +1,82 @@
 # Interactive Web-Based OS Simulator
 
-A comprehensive web-based operating system simulator that demonstrates various OS concepts including process scheduling algorithms and deadlock detection through interactive visualizations.
+Hey there! 👋 Welcome to our Interactive Web-Based OS Simulator. This project brings operating system concepts to life through an engaging web interface. Whether you're a student learning OS concepts or a developer interested in process scheduling and deadlock detection, this simulator is designed to make learning fun and interactive!
 
-## Features
+## 🌟 What's Inside?
 
-- **Process Scheduling Algorithms**
-  - First-Come-First-Serve (FCFS)
-  - Shortest Job First (SJF)
-  - Priority Scheduling
-  - Round Robin Scheduling
-  - Interactive Gantt chart visualization
-  - Performance metrics calculation
+### Process Scheduling Simulator
+We've implemented four popular scheduling algorithms that you can experiment with:
 
-- **Resource Allocation Graph (RAG) Simulator**
-  - Interactive graph visualization
-  - Process and resource management
-  - Request and allocation edge creation
-  - Deadlock detection with cycle analysis
-  - Visual feedback for deadlocked nodes
-  - Modern and intuitive user interface
-  - Real-time graph updates
-  - Clear visual distinction between processes and resources
+1. **First-Come-First-Serve (FCFS)**
+   - The classic scheduling algorithm
+   - Processes are executed in the order they arrive
+   - Perfect for understanding basic scheduling concepts
 
-## Tech Stack
+2. **Shortest Job First (SJF)**
+   - Optimizes for minimum waiting time
+   - Executes the shortest job first
+   - Great for learning about optimization in scheduling
+
+3. **Priority Scheduling**
+   - Assigns priorities to processes
+   - Higher priority processes get executed first
+   - Ideal for understanding priority-based systems
+
+4. **Round Robin Scheduling**
+   - Uses time quantum for fair process execution
+   - Perfect for learning about time-sharing systems
+   - Great visualization of CPU time distribution
+
+### Resource Allocation Graph (RAG) Simulator
+Our RAG simulator is a powerful tool for understanding resource management and deadlock scenarios:
+
+#### Core Features
+- 🎯 Create processes and resources visually
+- 🔄 Add request and allocation edges
+- ⚠️ Detect deadlocks in real-time
+- 🎨 Visual feedback for deadlocked nodes
+- 📊 Clear distinction between processes and resources
+
+#### Advanced Features
+- ⏱️ **Starvation Detection**
+  - Monitor process waiting times
+  - Set custom thresholds for starvation detection
+  - Get alerts for processes waiting too long
+  - Track resource allocation patterns
+
+- 🔍 **Deadlock Analysis**
+  - Real-time cycle detection
+  - Visual highlighting of deadlocked processes
+  - Detailed cycle information
+  - Easy-to-understand deadlock visualization
+
+- 📈 **Resource Management**
+  - Track resource allocation
+  - Monitor process requests
+  - Visualize resource dependencies
+  - Reset and clear graph for new scenarios
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- HTML5 & CSS3
-- JavaScript (ES6+)
-- [Vis.js](https://visjs.org/) - For interactive graph visualization
-- [Tailwind CSS](https://tailwindcss.com/) - For responsive UI design
-- Modern UI components and animations
+- **HTML5 & CSS3**: For structure and styling
+- **JavaScript (ES6+)**: For interactive features
+- **Vis.js**: Powers our beautiful graph visualizations
+- **Tailwind CSS**: Makes our UI responsive and modern
 
 ### Backend
-- Python 3.x
-- Flask - Web framework
-- NetworkX - For graph operations and deadlock detection
-- Matplotlib - For Gantt chart generation
+- **Python 3.x**: Our main programming language
+- **Flask**: Powers our web framework
+- **NetworkX**: Handles graph operations and deadlock detection
+- **Matplotlib**: Creates those awesome Gantt charts
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 Interactive-Web-Based-OS-Simulator/
 ├── app.py                  # Main Flask application
 ├── graph.py               # Graph generation utilities
-├── vercel.json            # Vercel configuration
+├── vercel.json            # Vercel deployment config
 ├── static/
 │   ├── css/
 │   │   └── style.css      # Custom styles
@@ -52,128 +85,74 @@ Interactive-Web-Based-OS-Simulator/
 │       ├── algorithm.js   # Algorithm-specific logic
 │       └── rag.js         # RAG simulator logic
 ├── templates/
-│   ├── index.html         # Home page with modern UI
+│   ├── index.html         # Home page
 │   ├── program.html       # Algorithm simulation page
-│   └── rag.html           # RAG simulator page with enhanced visualization
-└── README.md              # Project documentation
+│   └── rag.html           # RAG simulator page
+└── README.md              # This documentation
 ```
 
-## UI Features
-
-- **Modern Design**
-  - Clean and professional interface
-  - Responsive layout for all devices
-  - Smooth animations and transitions
-  - Intuitive navigation
-  - Clear visual hierarchy
-
-- **Interactive Elements**
-  - Dynamic graph visualization
-  - Real-time updates
-  - Hover effects and feedback
-  - Clear process/resource distinction
-  - Easy-to-use controls
-
-## Flow Diagrams
-
-### Process Scheduling Flow
-```mermaid
-graph TD
-    A[User Input] --> B[Select Algorithm]
-    B --> C[Enter Process Details]
-    C --> D[Calculate Schedule]
-    D --> E[Generate Gantt Chart]
-    E --> F[Calculate Metrics]
-    F --> G[Display Results]
-```
-
-### RAG Simulator Flow
-```mermaid
-graph TD
-    A[User Input] --> B[Add Process/Resource]
-    B --> C[Create Edges]
-    C --> D[Check for Deadlock]
-    D --> E[Detect Cycles]
-    E --> F[Highlight Deadlocked Nodes]
-    F --> G[Display Results]
-```
-
-## Installation
+## 🚀 Getting Started
 
 ### Local Development
 
-1. Clone the repository:
-```bash
-git clone https://github.com/kunall0880/Interactive-Web-Based-OS-Simulator.git
-cd Interactive-Web-Based-OS-Simulator
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/Interactive-Web-Based-OS-Simulator.git
+   cd Interactive-Web-Based-OS-Simulator
+   ```
 
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate 
-```
+2. **Set up your environment**
+   ```bash
+   python -m venv venv
+   # On Windows:
+   venv\Scripts\activate
+   # On Unix or MacOS:
+   source venv/bin/activate
+   ```
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4. Run the application:
-```bash
-python app.py
-```
+4. **Run the application**
+   ```bash
+   python app.py
+   ```
 
-5. Open your browser and navigate to:
-```
-http://localhost:5000
-```
+5. **Open your browser**
+   Visit `http://localhost:5000`
 
-### Vercel Deployment
+### Using the Simulator
 
-1. Install Vercel CLI:
-```bash
-npm install -g vercel
-```
-
-2. Login to Vercel:
-```bash
-vercel login
-```
-
-3. Deploy the project:
-```bash
-vercel
-```
-
-4. For subsequent deployments:
-```bash
-vercel --prod
-```
-
-## Environment Variables
-
-For Vercel deployment, you need to set the following environment variables:
-
-- `PYTHON_VERSION`: Set to `3.9` (or your preferred Python version)
-- `FLASK_ENV`: Set to `production`
-
-## Usage
-
-### Process Scheduling
-1. Select a scheduling algorithm from the home page
+#### Process Scheduling
+1. Select your preferred algorithm from the home page
 2. Enter the number of processes
-3. Input arrival times and burst times for each process
-4. Click "Start" to see the simulation
-5. View the Gantt chart and performance metrics
+3. Fill in the details:
+   - Arrival time
+   - Burst time
+   - Priority (for Priority Scheduling)
+   - Time quantum (for Round Robin)
+4. Click "Start" to see the magic happen!
+5. Explore the Gantt chart and performance metrics
 
-### RAG Simulator
+#### RAG Simulator
 1. Add processes and resources using the input fields
-2. Create request and allocation edges between processes and resources
+2. Create connections between processes and resources
 3. Click "Check for Deadlock" to analyze the graph
-4. View the results and highlighted deadlocked nodes
+4. Watch as the simulator highlights any deadlocked nodes
 
-## Contributing
+## 🌐 Deployment
+
+This project is deployed on Vercel. The deployment configuration is handled by `vercel.json`, which includes:
+- Python 3.11 runtime
+- Proper routing for Flask
+- Environment variables
+- Memory and duration limits
+
+## 🤝 Contributing
+
+We love contributions! Here's how you can help:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -181,22 +160,30 @@ For Vercel deployment, you need to set the following environment variables:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- [Vis.js](https://visjs.org/) for graph visualization
+- [Vis.js](https://visjs.org/) for the amazing graph visualizations
 - [NetworkX](https://networkx.org/) for graph operations
-- [Flask](https://flask.palletsprojects.com/) web framework
-- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [Flask](https://flask.palletsprojects.com/) for the web framework
+- [Tailwind CSS](https://tailwindcss.com/) for the beautiful UI
 - [Vercel](https://vercel.com/) for hosting
 
-## Contact
+## 📞 Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+Have questions or suggestions? Feel free to:
+- Open an issue
+- Submit a pull request
+- Reach out to us through GitHub
 
-Project Link: [https://github.com/yourusername/Interactive-Web-Based-OS-Simulator](https://github.com/yourusername/Interactive-Web-Based-OS-Simulator)
+## 🔗 Links
 
-Live Demo: [https://interactive-os-simulator.vercel.app](https://interactive-os-simulator.vercel.app)
+- [Live Demo](https://interactive-os-simulator.vercel.app)
+- [GitHub Repository](https://github.com/yourusername/Interactive-Web-Based-OS-Simulator)
+
+---
+
+Made with ❤️ for the OS learning community

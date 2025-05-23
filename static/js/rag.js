@@ -118,8 +118,8 @@ async function addRequestEdge() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    from: processId,
-                    to: resourceId,
+                    source: processId,
+                    target: resourceId,
                     type: 'request'
                 })
             });
@@ -151,8 +151,8 @@ async function addAllocationEdge() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    from: resourceId,
-                    to: processId,
+                    source: resourceId,
+                    target: processId,
                     type: 'allocation'
                 })
             });
@@ -238,9 +238,79 @@ async function checkDeadlock() {
     }
 }
 
+// Function to check for starvation
+async function checkStarvation() {
+    try {
+        const response = await fetch('/rag/check_starvation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                threshold: 0
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            const resultDiv = document.getElementById('starvation-result');
+            
+            if (result.starvation_detected) {
+                // Highlight starving processes in blue
+                for (const process of result.starving_processes) {
+                    data.nodes.update({ 
+                        id: process.process, 
+                        color: { background: '#3b82f6' }  // Blue color
+                    });
+                }
+                
+                // Create detailed message
+                const starvingList = result.starving_processes
+                    .map(p => `${p.process} (waiting for ${p.wait_time} time units)`)
+                    .join('\n');
+                
+                resultDiv.innerHTML = `
+                    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+                        <p class="font-semibold text-blue-800">Starvation Detected!</p>
+                        <p class="text-blue-700 mt-2">The following processes are starving:</p>
+                        <ul class="list-disc list-inside mt-2 text-blue-700">
+                            ${result.starving_processes.map(p => 
+                                `<li>${p.process} (waiting for ${p.wait_time} time units)</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+                showPopup('Starvation Detected', 
+                    `The following processes are starving:\n${starvingList}`);
+            } else {
+                // Reset node colors
+                const nodes = data.nodes.get();
+                for (const node of nodes) {
+                    if (node.shape === 'dot') {  // Only reset process nodes
+                        data.nodes.update({ id: node.id, color: { background: 'white' } });
+                    }
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded">
+                        <p class="text-green-800">No starvation detected.</p>
+                    </div>
+                `;
+                
+                showPopup('No Starvation', 'No processes are currently starving.');
+            }
+        }
+    } catch (error) {
+        console.error('Error checking for starvation:', error);
+        showPopup('Error', 'An error occurred while checking for starvation.');
+    }
+}
+
 // Add event listeners
 document.getElementById('add-process').addEventListener('click', addProcess);
 document.getElementById('add-resource').addEventListener('click', addResource);
 document.getElementById('add-request').addEventListener('click', addRequestEdge);
 document.getElementById('add-allocation').addEventListener('click', addAllocationEdge);
-document.getElementById('check-deadlock').addEventListener('click', checkDeadlock); 
+document.getElementById('check-deadlock').addEventListener('click', checkDeadlock);
+document.getElementById('check-starvation').addEventListener('click', checkStarvation); 

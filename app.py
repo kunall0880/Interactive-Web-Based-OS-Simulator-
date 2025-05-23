@@ -10,6 +10,9 @@ app = Flask(__name__)
 # Initialize a directed graph for RAG
 rag_graph = nx.DiGraph()
 
+# Initialize a dictionary to track process waiting times
+process_waiting_times = {}
+
 # Error handler
 @app.errorhandler(Exception)
 def handle_error(error):
@@ -289,40 +292,27 @@ def roundRobin():
 def rag():
     return render_template('rag.html')
 
-@app.route('/rag/check_deadlock', methods=['POST'])
-def check_rag_deadlock():
+@app.route('/rag/check_starvation', methods=['POST'])
+def check_starvation():
     try:
         data = request.get_json()
-        nodes = data.get('nodes', [])
-        edges = data.get('edges', [])
+        threshold = data.get('threshold', 0)  # Default threshold of 0 time units
         
-        # Clear existing graph
-        rag_graph.clear()
+        # Check if any process has been waiting too long
+        starving_processes = []
+        for process, wait_time in process_waiting_times.items():
+            if wait_time > threshold:
+                starving_processes.append({
+                    'process': process,
+                    'wait_time': wait_time
+                })
         
-        # Add nodes and edges
-        rag_graph.add_nodes_from(nodes)
-        rag_graph.add_edges_from([(edge['from'], edge['to']) for edge in edges])
-        
-        # Check for cycles (deadlocks)
-        try:
-            cycle = nx.find_cycle(rag_graph)
-            # Get all nodes involved in the cycle
-            deadlock_nodes = set()
-            for edge in cycle:
-                deadlock_nodes.add(edge[0])
-                deadlock_nodes.add(edge[1])
-            return jsonify({
-                'deadlock': True,
-                'nodes': list(deadlock_nodes)
-            })
-        except nx.NetworkXNoCycle:
-            return jsonify({
-                'deadlock': False,
-                'nodes': []
-            })
-            
+        return jsonify({
+            'starvation_detected': len(starving_processes) > 0,
+            'starving_processes': starving_processes
+        })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return handle_error(e)
 
 @app.route('/rag/add_node', methods=['POST'])
 def add_rag_node():
@@ -331,29 +321,64 @@ def add_rag_node():
         node_id = data.get('id')
         node_type = data.get('type')  # 'process' or 'resource'
         
-        if node_id:
-            rag_graph.add_node(node_id, type=node_type)
-            return jsonify({'success': True})
-        return jsonify({'error': 'Invalid node ID'}), 400
+        if node_type == 'process':
+            process_waiting_times[node_id] = 0  # Initialize waiting time for new process
         
+        rag_graph.add_node(node_id, type=node_type)
+        return jsonify({'message': f'Node {node_id} added successfully'})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return handle_error(e)
 
 @app.route('/rag/add_edge', methods=['POST'])
 def add_rag_edge():
     try:
         data = request.get_json()
-        from_node = data.get('from')
-        to_node = data.get('to')
+        source = data.get('source')
+        target = data.get('target')
         edge_type = data.get('type')  # 'request' or 'allocation'
         
-        if from_node and to_node:
-            rag_graph.add_edge(from_node, to_node, type=edge_type)
-            return jsonify({'success': True})
-        return jsonify({'error': 'Invalid edge data'}), 400
+        rag_graph.add_edge(source, target, type=edge_type)
         
+        # Update waiting times for processes
+        if edge_type == 'request':
+            # Increment waiting time for the requesting process
+            if source in process_waiting_times:
+                process_waiting_times[source] += 1
+        elif edge_type == 'allocation':
+            # Reset waiting time when process gets resource
+            if target in process_waiting_times:
+                process_waiting_times[target] = 0
+        
+        return jsonify({'message': f'Edge from {source} to {target} added successfully'})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return handle_error(e)
+
+@app.route('/rag/check_deadlock', methods=['POST'])
+def check_rag_deadlock():
+    try:
+        # Check for cycles in the graph
+        try:
+            cycle = nx.find_cycle(rag_graph)
+            return jsonify({
+                'deadlock_detected': True,
+                'cycle': cycle
+            })
+        except nx.NetworkXNoCycle:
+            return jsonify({
+                'deadlock_detected': False,
+                'cycle': None
+            })
+    except Exception as e:
+        return handle_error(e)
+
+@app.route('/rag/reset', methods=['POST'])
+def reset_rag():
+    try:
+        rag_graph.clear()
+        process_waiting_times.clear()
+        return jsonify({'message': 'RAG reset successfully'})
+    except Exception as e:
+        return handle_error(e)
 
 if __name__ == "__main__":
     app.run(debug=True)
