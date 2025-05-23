@@ -1,3 +1,6 @@
+let data;
+let network;
+
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing RAG simulator...');
@@ -10,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     console.log('Creating network...');
-    const data = {
+    data = {
         nodes: new vis.DataSet(),
         edges: new vis.DataSet()
     };
@@ -40,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     try {
-        const network = new vis.Network(container, data, options);
+        network = new vis.Network(container, data, options);
         console.log('Network created successfully');
         
         // Add event listeners
