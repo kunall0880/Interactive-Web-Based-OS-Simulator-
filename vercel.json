@@ -20,11 +20,5 @@
         "FLASK_ENV": "production",
         "PYTHONPATH": ".",
         "FLASK_APP": "app.py"
-    },
-    "functions": {
-        "app.py": {
-            "memory": 1024,
-            "maxDuration": 10
-        }
     }
 } 
