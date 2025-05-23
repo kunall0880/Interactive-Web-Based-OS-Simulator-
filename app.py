@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import sys
 import traceback
 import networkx as nx
@@ -8,7 +8,7 @@ matplotlib.use('Agg')  # Use Agg backend for serverless environment
 
 from graph import graph, graphRound
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # Initialize a directed graph for RAG
 rag_graph = nx.DiGraph()
@@ -27,6 +27,11 @@ def handle_error(error):
         return jsonify({"error": str(error)}), 500
     else:
         return render_template("error.html", error=str(error)), 500
+
+# Serve static files
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('static', path)
 
 # Vercel requires this handler
 @app.route("/api/<path:path>", methods=['GET', 'POST', 'PUT', 'DELETE'])
