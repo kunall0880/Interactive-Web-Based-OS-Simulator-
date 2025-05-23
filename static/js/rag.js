@@ -1,53 +1,111 @@
-// Initialize the network
-const container = document.getElementById('rag-graph');
-const data = {
-    nodes: new vis.DataSet(),
-    edges: new vis.DataSet()
-};
-const options = {
-    nodes: {
-        shape: 'dot',
-        size: 30,
-        font: {
-            size: 16
-        }
-    },
-    edges: {
-        arrows: 'to',
-        smooth: {
-            type: 'cubicBezier'
-        }
-    },
-    physics: {
-        stabilization: false,
-        barnesHut: {
-            gravitationalConstant: -80000,
-            springConstant: 0.001,
-            springLength: 200
-        }
-    }
-};
-const network = new vis.Network(container, data, options);
-
-// Add event listeners when the DOM is loaded
+// Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Add process button
-    document.getElementById('add-process').addEventListener('click', addProcess);
+    console.log('Initializing RAG simulator...');
     
-    // Add resource button
-    document.getElementById('add-resource').addEventListener('click', addResource);
+    // Initialize the network
+    const container = document.getElementById('rag-graph');
+    if (!container) {
+        console.error('Graph container not found!');
+        return;
+    }
     
-    // Add request edge button
-    document.getElementById('add-request').addEventListener('click', addRequestEdge);
+    console.log('Creating network...');
+    const data = {
+        nodes: new vis.DataSet(),
+        edges: new vis.DataSet()
+    };
     
-    // Add allocation edge button
-    document.getElementById('add-allocation').addEventListener('click', addAllocationEdge);
+    const options = {
+        nodes: {
+            shape: 'dot',
+            size: 30,
+            font: {
+                size: 16
+            }
+        },
+        edges: {
+            arrows: 'to',
+            smooth: {
+                type: 'cubicBezier'
+            }
+        },
+        physics: {
+            stabilization: false,
+            barnesHut: {
+                gravitationalConstant: -80000,
+                springConstant: 0.001,
+                springLength: 200
+            }
+        }
+    };
     
-    // Check deadlock button
-    document.getElementById('check-deadlock').addEventListener('click', checkDeadlock);
-    
-    // Check starvation button
-    document.getElementById('check-starvation').addEventListener('click', checkStarvation);
+    try {
+        const network = new vis.Network(container, data, options);
+        console.log('Network created successfully');
+        
+        // Add event listeners
+        console.log('Adding event listeners...');
+        
+        // Add process button
+        const addProcessBtn = document.getElementById('add-process');
+        if (addProcessBtn) {
+            addProcessBtn.addEventListener('click', addProcess);
+            console.log('Add process button listener added');
+        } else {
+            console.error('Add process button not found!');
+        }
+        
+        // Add resource button
+        const addResourceBtn = document.getElementById('add-resource');
+        if (addResourceBtn) {
+            addResourceBtn.addEventListener('click', addResource);
+            console.log('Add resource button listener added');
+        } else {
+            console.error('Add resource button not found!');
+        }
+        
+        // Add request edge button
+        const addRequestBtn = document.getElementById('add-request');
+        if (addRequestBtn) {
+            addRequestBtn.addEventListener('click', addRequestEdge);
+            console.log('Add request button listener added');
+        } else {
+            console.error('Add request button not found!');
+        }
+        
+        // Add allocation edge button
+        const addAllocationBtn = document.getElementById('add-allocation');
+        if (addAllocationBtn) {
+            addAllocationBtn.addEventListener('click', addAllocationEdge);
+            console.log('Add allocation button listener added');
+        } else {
+            console.error('Add allocation button not found!');
+        }
+        
+        // Check deadlock button
+        const checkDeadlockBtn = document.getElementById('check-deadlock');
+        if (checkDeadlockBtn) {
+            checkDeadlockBtn.addEventListener('click', checkDeadlock);
+            console.log('Check deadlock button listener added');
+        } else {
+            console.error('Check deadlock button not found!');
+        }
+        
+        // Check starvation button
+        const checkStarvationBtn = document.getElementById('check-starvation');
+        if (checkStarvationBtn) {
+            checkStarvationBtn.addEventListener('click', checkStarvation);
+            console.log('Check starvation button listener added');
+        } else {
+            console.error('Check starvation button not found!');
+        }
+        
+        console.log('All event listeners added successfully');
+        
+    } catch (error) {
+        console.error('Error initializing network:', error);
+        alert('Error initializing the graph. Please check the console for details.');
+    }
 });
 
 // Function to add a process to the RAG

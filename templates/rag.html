@@ -171,9 +171,65 @@
             border-radius: 0.375rem;
             background: #f8fafc;
         }
+        /* Add popup overlay styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .popup-overlay.active {
+            display: flex;
+        }
+        
+        .popup-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            width: 400px;
+        }
+        
+        .popup-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .popup-message {
+            margin-bottom: 1.5rem;
+        }
+        
+        .popup-close {
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        
+        .popup-close:hover {
+            background: #2563eb;
+        }
     </style>
 </head>
 <body>
+    <!-- Add popup overlay -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <h2 id="popup-title" class="popup-title"></h2>
+            <p id="popup-message" class="popup-message"></p>
+            <button id="popup-close" class="popup-close">Close</button>
+        </div>
+    </div>
+
     <a href="/" class="back-btn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z" clip-rule="evenodd" />
@@ -253,6 +309,18 @@
         </div>
     </div>
 
+    <script>
+        // Initialize the network when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing network...');
+            const container = document.getElementById('rag-graph');
+            if (!container) {
+                console.error('Graph container not found!');
+                return;
+            }
+            console.log('Graph container found, loading rag.js...');
+        });
+    </script>
     <script src="/static/js/rag.js"></script>
 </body>
 </html> 
