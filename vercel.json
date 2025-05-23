@@ -12,6 +12,10 @@
     ],
     "routes": [
         {
+            "src": "/static/(.*)",
+            "dest": "/static/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "app.py"
         }
@@ -19,6 +23,7 @@
     "env": {
         "FLASK_ENV": "production",
         "PYTHONPATH": ".",
-        "FLASK_APP": "app.py"
+        "FLASK_APP": "app.py",
+        "MPLCONFIGDIR": "/tmp/matplotlib"
     }
 } 

@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, jsonify
 import sys
 import traceback
 import networkx as nx
+import os
+import matplotlib
+matplotlib.use('Agg')  # Use Agg backend for serverless environment
 
 from graph import graph, graphRound
 
@@ -384,4 +387,4 @@ if __name__ == "__main__":
     app.run(debug=True)
 else:
     # This is required for Vercel
-    handler = app
+    app = app
