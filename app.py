@@ -8,7 +8,10 @@ matplotlib.use('Agg')  # Use Agg backend for serverless environment
 
 from graph import graph, graphRound
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(__name__, 
+    static_folder='static',
+    static_url_path='/static'
+)
 
 # Initialize a directed graph for RAG
 rag_graph = nx.DiGraph()
@@ -325,17 +328,40 @@ def check_starvation():
 @app.route('/rag/add_node', methods=['POST'])
 def add_rag_node():
     try:
+        print("Received request to add node") # Debug log
         data = request.get_json()
+        print("Request data:", data) # Debug log
+        
+        if not data:
+            print("No data received") # Debug log
+            return jsonify({'error': 'No data provided'}), 400
+            
         node_id = data.get('id')
         node_type = data.get('type')  # 'process' or 'resource'
+        
+        if not node_id or not node_type:
+            print("Missing node_id or node_type") # Debug log
+            return jsonify({'error': 'Missing node_id or node_type'}), 400
+            
+        print(f"Adding node: id={node_id}, type={node_type}") # Debug log
         
         if node_type == 'process':
             process_waiting_times[node_id] = 0  # Initialize waiting time for new process
         
         rag_graph.add_node(node_id, type=node_type)
-        return jsonify({'message': f'Node {node_id} added successfully'})
+        print("Node added successfully") # Debug log
+        
+        return jsonify({
+            'message': f'Node {node_id} added successfully',
+            'node': {
+                'id': node_id,
+                'type': node_type
+            }
+        })
     except Exception as e:
-        return handle_error(e)
+        print(f"Error adding node: {str(e)}") # Debug log
+        print(traceback.format_exc()) # Debug log
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/rag/add_edge', methods=['POST'])
 def add_rag_edge():
@@ -387,6 +413,14 @@ def reset_rag():
         return jsonify({'message': 'RAG reset successfully'})
     except Exception as e:
         return handle_error(e)
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error=error), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error.html', error=error), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

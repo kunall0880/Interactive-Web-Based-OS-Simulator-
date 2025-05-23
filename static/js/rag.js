@@ -29,79 +29,138 @@ const options = {
 };
 const network = new vis.Network(container, data, options);
 
+// Add event listeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add process button
+    document.getElementById('add-process').addEventListener('click', addProcess);
+    
+    // Add resource button
+    document.getElementById('add-resource').addEventListener('click', addResource);
+    
+    // Add request edge button
+    document.getElementById('add-request').addEventListener('click', addRequestEdge);
+    
+    // Add allocation edge button
+    document.getElementById('add-allocation').addEventListener('click', addAllocationEdge);
+    
+    // Check deadlock button
+    document.getElementById('check-deadlock').addEventListener('click', checkDeadlock);
+    
+    // Check starvation button
+    document.getElementById('check-starvation').addEventListener('click', checkStarvation);
+});
+
 // Function to add a process to the RAG
 async function addProcess() {
     const processId = document.getElementById('process-id').value;
-    if (processId) {
-        try {
-            const response = await fetch('/rag/add_node', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: processId,
-                    type: 'process'
-                })
-            });
+    console.log('Adding process:', processId); // Debug log
+    
+    if (!processId) {
+        console.error('Process ID is empty');
+        alert('Please enter a process ID');
+        return;
+    }
+    
+    try {
+        console.log('Sending request to /rag/add_node'); // Debug log
+        const response = await fetch('/rag/add_node', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: processId,
+                type: 'process'
+            })
+        });
+        
+        console.log('Response status:', response.status); // Debug log
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Server response:', result); // Debug log
             
-            if (response.ok) {
-                data.nodes.add({ 
-                    id: processId, 
-                    label: processId, 
-                    color: { background: 'white' },
-                    shape: 'dot'
-                });
-                document.getElementById('process-id').value = '';
-                
-                // Update process select dropdown
-                const processSelect = document.getElementById('process-select');
-                const option = document.createElement('option');
-                option.value = processId;
-                option.textContent = processId;
-                processSelect.appendChild(option);
-            }
-        } catch (error) {
-            console.error('Error adding process:', error);
+            data.nodes.add({ 
+                id: processId, 
+                label: processId, 
+                color: { background: 'white' },
+                shape: 'dot'
+            });
+            document.getElementById('process-id').value = '';
+            
+            // Update process select dropdown
+            const processSelect = document.getElementById('process-select');
+            const option = document.createElement('option');
+            option.value = processId;
+            option.textContent = processId;
+            processSelect.appendChild(option);
+            
+            console.log('Process added successfully'); // Debug log
+        } else {
+            const error = await response.json();
+            console.error('Server error:', error); // Debug log
+            alert('Failed to add process: ' + (error.message || 'Unknown error'));
         }
+    } catch (error) {
+        console.error('Error adding process:', error);
+        alert('Error adding process: ' + error.message);
     }
 }
 
 // Function to add a resource to the RAG
 async function addResource() {
     const resourceId = document.getElementById('resource-id').value;
-    if (resourceId) {
-        try {
-            const response = await fetch('/rag/add_node', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: resourceId,
-                    type: 'resource'
-                })
-            });
+    console.log('Adding resource:', resourceId); // Debug log
+    
+    if (!resourceId) {
+        console.error('Resource ID is empty');
+        alert('Please enter a resource ID');
+        return;
+    }
+    
+    try {
+        console.log('Sending request to /rag/add_node'); // Debug log
+        const response = await fetch('/rag/add_node', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: resourceId,
+                type: 'resource'
+            })
+        });
+        
+        console.log('Response status:', response.status); // Debug log
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Server response:', result); // Debug log
             
-            if (response.ok) {
-                data.nodes.add({ 
-                    id: resourceId, 
-                    label: resourceId, 
-                    color: { background: 'white' },
-                    shape: 'diamond'
-                });
-                document.getElementById('resource-id').value = '';
-                
-                // Update resource select dropdown
-                const resourceSelect = document.getElementById('resource-select');
-                const option = document.createElement('option');
-                option.value = resourceId;
-                option.textContent = resourceId;
-                resourceSelect.appendChild(option);
-            }
-        } catch (error) {
-            console.error('Error adding resource:', error);
+            data.nodes.add({ 
+                id: resourceId, 
+                label: resourceId, 
+                color: { background: 'white' },
+                shape: 'diamond'
+            });
+            document.getElementById('resource-id').value = '';
+            
+            // Update resource select dropdown
+            const resourceSelect = document.getElementById('resource-select');
+            const option = document.createElement('option');
+            option.value = resourceId;
+            option.textContent = resourceId;
+            resourceSelect.appendChild(option);
+            
+            console.log('Resource added successfully'); // Debug log
+        } else {
+            const error = await response.json();
+            console.error('Server error:', error); // Debug log
+            alert('Failed to add resource: ' + (error.message || 'Unknown error'));
         }
+    } catch (error) {
+        console.error('Error adding resource:', error);
+        alert('Error adding resource: ' + error.message);
     }
 }
 
@@ -305,12 +364,4 @@ async function checkStarvation() {
         console.error('Error checking for starvation:', error);
         showPopup('Error', 'An error occurred while checking for starvation.');
     }
-}
-
-// Add event listeners
-document.getElementById('add-process').addEventListener('click', addProcess);
-document.getElementById('add-resource').addEventListener('click', addResource);
-document.getElementById('add-request').addEventListener('click', addRequestEdge);
-document.getElementById('add-allocation').addEventListener('click', addAllocationEdge);
-document.getElementById('check-deadlock').addEventListener('click', checkDeadlock);
-document.getElementById('check-starvation').addEventListener('click', checkStarvation); 
+} 
